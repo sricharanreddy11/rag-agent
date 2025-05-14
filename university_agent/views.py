@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from core.services.qdrant_service import QdrantRAGAgent
 from university_agent.models import ChatSession, ChatMessage
@@ -27,6 +27,17 @@ class ChatSessionAPI(viewsets.ModelViewSet):
             return ChatSession.objects.none()
         return ChatSession.objects.filter(session_id=temp_session_id)
 
+    @action(methods=["GET"], detail=False, url_path="temp")
+    def get_temp_session_detail(self, request):
+        temp_session_id = request.GET.get('temp_session_id')
+        if not temp_session_id:
+            return Response({'detail': 'No temp_session_id provided'}, status=HTTP_400_BAD_REQUEST)
+        session_obj = ChatSession.objects.filter(session_id=temp_session_id).first()
+        if not session_obj:
+            return Response({'detail': 'No active session object present'}, status=HTTP_400_BAD_REQUEST)
+        response = ChatSessionDetailSerializer(session_obj).data
+
+        return Response(response, status=HTTP_200_OK)
 
     @action(methods=["POST"], detail=False, url_path="send-message")
     def send_message(self, request, pk=None):
