@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from core.services.qdrant_service import QdrantRAGAgent
-from university_agent.models import ChatSession, ChatMessage
+from university_agent.models import ChatSession, ChatMessage, Task
 from university_agent.serializers import ChatSessionDetailSerializer, \
-    ChatSessionListSerializer
+    ChatSessionListSerializer, TaskSerializer
 
 
 class ChatSessionAPI(viewsets.ModelViewSet):
@@ -113,3 +113,10 @@ class TempSessionAPI(viewsets.ModelViewSet):
         response = ChatSessionDetailSerializer(session_obj).data
 
         return Response(response, status=HTTP_200_OK)
+
+
+class TaskAPI(viewsets.ModelViewSet):
+    serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        return Task.objects.all()

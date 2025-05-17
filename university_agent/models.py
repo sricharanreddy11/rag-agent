@@ -30,3 +30,24 @@ class ChatMessage(UserAbstractModel):
     class Meta:
         ordering = ['created_at']
         db_table = 'university_message'
+
+
+class Task(UserAbstractModel):
+    STATUS_CHOICES = [
+        ('todo', 'To Do'),
+        ('completed', 'Completed'),
+    ]
+
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+    title = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='todo')
+    priority = models.CharField(max_length=15, choices=PRIORITY_CHOICES, default='medium')
+
+    class Meta:
+        db_table = 'task'
