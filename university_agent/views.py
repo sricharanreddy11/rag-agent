@@ -41,7 +41,7 @@ class ChatSessionAPI(viewsets.ModelViewSet):
         )
 
         rag_agent = QdrantRAGAgent()
-        response = rag_agent.get_response(user_message.content, str(session_obj.session_id))
+        response = rag_agent.get_response_for_existing_user(user_message.content, str(session_obj.session_id))
 
         assistant_message = ChatMessage.objects.create(
             session=session_obj,
@@ -100,7 +100,7 @@ class TempSessionAPI(viewsets.ModelViewSet):
         )
 
         rag_agent = QdrantRAGAgent()
-        response = rag_agent.get_response(user_message.content, str(session_obj.session_id))
+        response = rag_agent.get_response_for_new_user(user_message.content, str(session_obj.session_id))
 
         assistant_message = ChatMessage.objects.create(
             session=session_obj,

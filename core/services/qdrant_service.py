@@ -7,7 +7,7 @@ import logging
 from typing import List, Dict, Optional
 
 from core.services.llm_interface import LLMInterface
-from university_agent.utils import get_previous_context_from_session
+from university_agent.utils import get_previous_context_from_session, identify_creation_intent_and_execute
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class QdrantServiceError(Exception):
 
 
 class QdrantRAGAgent:
-    def __init__(self):
+    def __init__(self, collection_name: str = "newStudents"):
         try:
             self.QDRANT_URL = os.environ.get("QDRANT_URL")
             self.QDRANT_API_KEY = os.environ.get("QDRANT_API_KEY")
@@ -29,11 +29,8 @@ class QdrantRAGAgent:
 
             self.client = qdrant_client.QdrantClient(url=self.QDRANT_URL, api_key=self.QDRANT_API_KEY)
             self.openai_client = openai.OpenAI()
-            self.collection_name = "anuragKB"
+            self.collection_name = collection_name
             # self.knowledge_base = config.meta_data.get("knowledge_base", [])
-            self.knowledge_base = [
-                "Category: All Services Overview\nHome Cleaning:\n  - Deep Cleaning\n  - Kitchen Cleaning\n  - Bathroom Cleaning\n\nAppliance Repair:\n  - AC Repair\n  - Washing Machine Repair\n  - Refrigerator Repair\n\nBeauty Services:\n  - Women's Salon at Home (Waxing, Facial, Manicure, Pedicure)\n  - Men's Salon at Home (Haircut, Beard Trim, Facial)\n\nPlumbing:\n  - Tap Repair\n  - Drain Cleaning\n  - Bathroom Fitting Installation\n\nElectrical:\n  - Fan Repair\n  - Switchboard Installation\n  - Inverter Repair\n\nSupport Services"
-            ]
 
             openai_api_key = os.environ.get("OPENAI_API_KEY")
             if not openai_api_key:
@@ -45,9 +42,9 @@ class QdrantRAGAgent:
             raise QdrantServiceError(f"Initialization failed: {str(e)}")
 
 
-    def create_collection(self):
+    def create_collection(self, knowledge_base):
         self._ensure_collection_exists()
-        self._populate_collection()
+        self._populate_collection(knowledge_base)
 
     def _ensure_collection_exists(self):
         """Create the Qdrant collection if it doesn't exist."""
@@ -69,7 +66,7 @@ class QdrantRAGAgent:
                 logger.error(f"Failed to create collection: {str(e)}")
                 raise QdrantServiceError(f"Failed to create collection: {str(e)}")
 
-    def _populate_collection(self):
+    def _populate_collection(self, knowledge_base):
         """Populate the Qdrant collection with meeting data."""
         print("Starting collection population...")
 
@@ -80,7 +77,7 @@ class QdrantRAGAgent:
             raise QdrantServiceError(f"Failed to check collection: {str(e)}")
 
         try:
-            if not self.knowledge_base:
+            if not knowledge_base:
                 logger.warning("No knowledge base entries found in configuration")
                 return
         except Exception as e:
@@ -88,7 +85,7 @@ class QdrantRAGAgent:
             raise QdrantServiceError(f"Failed to fetch knowledge base: {str(e)}")
 
         points = []
-        for i, kb in enumerate(self.knowledge_base):
+        for i, kb in enumerate(knowledge_base):
             try:
                 text_to_embed = f'''
                 {kb}
@@ -108,7 +105,7 @@ class QdrantRAGAgent:
                     id=point_id,
                     vector=vector,
                     payload={
-                        'scenario': kb
+                        'context': kb
                     }
                 ))
 
@@ -170,13 +167,13 @@ class QdrantRAGAgent:
             return ""
         context_parts = []
         for r in vector_results:
-            context_parts.append(f"""{r.payload.get('scenario', "")}
+            context_parts.append(f"""{r.payload.get('context', "")}
                                         """)
 
         context = "\n\n".join(context_parts)
         return context
 
-    def get_response_using_rag(self, user_query: str, n_points: int = 3,
+    def get_response_using_rag(self, config_name, user_query: str, n_points: int = 3,
                                previous_context: Optional[List[Dict[str, str]]] = None) -> str:
         if not user_query:
             logger.warning("Empty user query provided")
@@ -195,7 +192,7 @@ class QdrantRAGAgent:
             context = ""
 
         try:
-            config_obj = LLMInterface().get_config_object(config_name="university-agent")
+            config_obj = LLMInterface().get_config_object(config_name=config_name)
             if not config_obj:
                 raise QdrantServiceError("Failed to get RAG messaging agent configuration")
         except Exception as e:
@@ -231,7 +228,7 @@ class QdrantRAGAgent:
             return "I apologize, but I'm having trouble generating a response at the moment."
 
 
-    def get_response(self, user_query: str, session_id: Optional[str] = None) -> str:
+    def get_response_for_new_user(self, user_query: str, session_id: Optional[str] = None) -> str:
         try:
             previous_context = []
             if session_id:
@@ -239,8 +236,30 @@ class QdrantRAGAgent:
 
             response = self.get_response_using_rag(
                 user_query=user_query,
-                n_points=5,
-                previous_context=previous_context
+                n_points=2,
+                previous_context=previous_context,
+                config_name='university-agent'
+            )
+            return response
+        except Exception as e:
+            logger.error(f"Failed to get response for rag agent: {str(e)}")
+            return "I apologize, but I'm having trouble processing your request at the moment."
+
+
+    def get_response_for_existing_user(self, user_query: str, session_id: Optional[str] = None) -> str:
+        try:
+            previous_context = []
+            creation_intent, response = identify_creation_intent_and_execute(user_query=user_query)
+            if creation_intent:
+                return response
+            if session_id:
+                previous_context = get_previous_context_from_session(session_id)
+
+            response = self.get_response_using_rag(
+                user_query=user_query,
+                n_points=1,
+                previous_context=previous_context,
+                config_name='university-agent'
             )
             return response
         except Exception as e:
