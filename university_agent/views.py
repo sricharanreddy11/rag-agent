@@ -120,7 +120,7 @@ class TaskAPI(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
 
     def get_queryset(self):
-        return Task.objects.all()
+        return Task.objects.filter()
 
 
 class TutorAPI(APIView):
