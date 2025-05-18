@@ -7,7 +7,7 @@ import uuid
 import logging
 from typing import List, Dict, Optional
 import re
-
+import requests
 from core.services.llm_interface import LLMInterface
 from university_agent.utils import get_previous_context_from_session, identify_creation_intent_and_execute
 
@@ -43,6 +43,99 @@ class QdrantRAGAgent:
             logger.error(f"Failed to initialize QdrantRAGAgent: {str(e)}")
             raise QdrantServiceError(f"Initialization failed: {str(e)}")
 
+    def search_qdrant_api(
+            self,
+            query_vector: List[float],
+            collection_name: str,
+            limit: int = 3,
+            score_threshold: float = 0.7
+    ):
+        """
+        Search Qdrant using direct REST API calls instead of the client library.
+        This may help bypass Windows-specific network issues.
+        """
+        qdrant_url = os.environ.get("QDRANT_URL")
+        qdrant_api_key = os.environ.get("QDRANT_API_KEY")
+
+        if not qdrant_url.endswith('/'):
+            qdrant_url += '/'
+
+        search_url = f"{qdrant_url}collections/{collection_name}/points/search"
+
+        print(search_url)
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+
+        if qdrant_api_key:
+            headers["api-key"] = qdrant_api_key
+
+        payload = {
+            "vector": query_vector,
+            "limit": limit,
+            "score_threshold": score_threshold,
+            "with_payload": True
+        }
+
+        try:
+            response = requests.post(
+                search_url,
+                headers=headers,
+                data=json.dumps(payload),
+                timeout=60  # Set a generous timeout
+            )
+
+            response.raise_for_status()  # Raise an exception for 4XX/5XX responses
+
+            result = response.json()
+            return result.get("result", [])
+        except QdrantServiceError as e:
+            logger.error(f"Qdrant API request error: {str(e)}")
+            raise Exception(f"Failed to search Qdrant via API: {str(e)}")
+
+    def get_context_from_vector_db_api(self, user_query: str, n_points: int = 3, score_threshold: float = 0.7) -> str:
+        if not user_query:
+            logger.warning("Empty user query provided")
+            return ""
+
+        try:
+            response = self.openai_client.embeddings.create(
+                model="text-embedding-ada-002",
+                input=user_query
+            )
+            query_vector = response.data[0].embedding
+        except Exception as e:
+            logger.error(f"OpenAI API error: {str(e)}")
+            raise Exception(f"Failed to generate embeddings: {str(e)}")
+
+        print("Searching Qdrant via API")
+        try:
+            # Use the API search function instead of client library
+            vector_results = self.search_qdrant_api(
+                query_vector=query_vector,
+                collection_name=self.collection_name,
+                limit=n_points,
+                score_threshold=score_threshold
+            )
+        except Exception as e:
+            logger.error(f"Qdrant API search error: {str(e)}")
+            raise Exception(f"Failed to search vector database via API: {str(e)}")
+
+        if not vector_results:
+            logger.warning("No results found in vector API search")
+            return ""
+
+        if len(vector_results) == 1:
+            return vector_results[0].get('payload', {}).get('context', "")
+
+        context_parts = []
+        for r in vector_results:
+            context_parts.append(f"""{r.get('payload', {}).get('context', "")}
+                                        """)
+
+        context = "\n\n".join(context_parts)
+        return context
 
     def create_collection(self, knowledge_base):
         self._ensure_collection_exists()
@@ -189,7 +282,7 @@ class QdrantRAGAgent:
             previous_context = []
 
         try:
-            context = self.get_context_from_vector_db(
+            context = self.get_context_from_vector_db_api(
                 user_query=user_query,
                 n_points=n_points
             )
@@ -276,7 +369,7 @@ class QdrantRAGAgent:
 
         user_query = f"User Details: {user_details}\n User Level: {user_level}\n User Query: {user_query}"
         try:
-            context_dict = self.get_context_from_vector_db(
+            context_dict = self.get_context_from_vector_db_api(
                 user_query=user_query,
                 n_points=1
             )
