@@ -110,3 +110,134 @@ def insert_knowledge_base_into_vector_db():
     ]
     QdrantRAGAgent(collection_name=collection_name).create_collection(
         knowledge_base=knowledge_base)
+
+def insert_syllabus_data():
+    knowledge_base = [
+          {
+            "course": "Memories for embedded systems",
+            "branch": "ECE",
+            "level": "Intermediate",
+            "description": "Designed for intermediate learners, this PDF provides a structured understanding of embedded system components like ROM/RAM memory types, sensor-actuator functions, and both onboard and external communication interfaces. It introduces concepts like memory shadowing and explains protocols like I2C and SPI with moderate technical depth. Each topic balances clarity and detail, preparing students to analyze embedded system requirements and choose appropriate components. It's well-suited for 3rd-year B.Tech ECE students ready to transition from basic understanding to hands-on application in labs or mini-projects.",
+            "link": "https://drive.google.com/file/d/1wad3iaRuI0vLEpm73vwLV9vV2tB1AtDp/view?usp=sharing"
+          },
+          {
+            "course": "Memories for embedded systems",
+            "branch": "ECE",
+            "level": "Beginner",
+            "description": "This beginner-friendly guide introduces the fundamentals of embedded systems, focusing on memory, sensors, actuators, and communication interfaces. It simplifies concepts using analogies and examples, like using ROM as a recipe book or explaining Bluetooth as a song-sharing method. The content is ideal for students new to embedded systems, helping them understand how devices sense the environment, store data, perform actions, and communicate. With visuals and relatable language, it builds a strong conceptual foundation while keeping technical terms minimal, making it perfect for those starting their embedded systems journey.",
+            "link": "https://drive.google.com/file/d/1ZHd0ss3ufTSU6G5LIEg7CR0csduJ6a6T/view?usp=sharing"
+          },
+          {
+            "course": "Memories for embedded systems",
+            "branch": "ECE",
+            "level": "Advanced",
+            "description": "This document delivers an advanced exploration of embedded system architecture, offering in-depth analysis of memory hierarchies, ROM/RAM variants, and data communication protocols. It includes precise timings, operational principles, and trade-offs, such as SRAM vs. DRAM, I2C vs. SPI, and communication latency. With complex technical language and real-world examples (e.g., BIOS shadowing, industrial memory), it is tailored for students preparing for research, design projects, or interviews. Ideal for final-year B.Tech ECE students aiming for mastery in embedded system design and optimization.",
+            "link": "https://drive.google.com/file/d/1wad3iaRuI0vLEpm73vwLV9vV2tB1AtDp/view?usp=sharing"
+          },
+          {
+            "course": "Antennas",
+            "branch": "ECE",
+            "level": "Beginner",
+            "description": "This PDF is designed as a beginner-friendly guide to the basics of antennas, ideal for 2nd-year ECE students new to the subject. It explains fundamental concepts like what antennas are, how they work, and their everyday applications using simple analogies and relatable examples. Key topics include types of antennas (isotropic, directional, and omni-directional), how antennas transmit and receive electromagnetic waves, and how they are used in devices such as smartphones, radios, and airplanes like the Boeing 787. Concepts like radiation patterns, main lobes, side lobes, and antenna size are introduced without mathematical complexity. The document keeps the tone light and engaging with \"fun facts\" and practical illustrations. It builds a strong conceptual foundation while sparking curiosity about real-world communication systems. This is an excellent first step for students preparing to dive deeper into electromagnetic theory and antenna design.",
+            "link": "https://drive.google.com/file/d/1uc4J4nDwJByrawE3OdKhYgUUqx4SJemA/view?usp=sharing"
+          },
+          {
+            "course": "Antennas",
+            "branch": "ECE",
+            "level": "Intermediate",
+            "description": "This intermediate-level guide provides a structured yet accessible exploration of antenna concepts tailored for students with basic knowledge of electromagnetic theory. It covers how antennas operate as transducers, converting electrical signals to electromagnetic waves and vice versa. Topics include radiation mechanisms (time-varying current and charge acceleration), transmission line modeling of antennas using Thevenin equivalents, and practical uses in systems like smartphones, radar, and aviation (e.g., Boeing 787 communication). The document explains technical parameters such as beamwidth, radiation intensity, field regions (near-field and far-field), and directivity with simplified equations and contextual examples. Students also learn about antenna efficiency and the reciprocity theorem, helping them understand both theoretical and applied aspects. This guide is ideal for ECE students seeking a balance between conceptual clarity and moderate technical depth—perfect for exam prep, lab understanding, or early-stage design projects.",
+            "link": "https://drive.google.com/file/d/1Cddh4_R70bZCh7H0t-5wAWCgh6YkdkIn/view?usp=sharing"
+          },
+          {
+            "course": "Antennas",
+            "branch": "ECE",
+            "level": "Advanced",
+            "description": "This advanced-level document is a comprehensive, high-depth resource on antenna theory, ideal for academically strong 2nd-year ECE students or those preparing for competitive exams and advanced projects. It begins with antenna fundamentals and radiation mechanisms and dives deep into technical models, including current density and radiation conditions. Students are introduced to rigorous analytical tools such as normalized field/power patterns, beam solid angles, Thevenin equivalent circuits, and the Poynting vector. The guide extensively discusses beamwidth analysis (HPBW, FNBW), field regions (reactive, radiating, and far-field), radiation intensity, and antenna efficiency. Complex formulas for directivity, aperture efficiency, and the front-to-back ratio are derived with examples. The inclusion of solid angle calculus, radiation power calculations, and advanced metrics like stray factor and reciprocity make this resource suitable for students aiming to master electromagnetic theory. It demands good mathematical skills and understanding of EMTL concepts, offering a solid foundation for research or higher-level engineering design.",
+            "link": "https://drive.google.com/file/d/1tvs5YTuYKaFNvXqEUvXOFjSn9xf2TI3z/view?usp=sharing"
+          },
+          {
+            "course": "Introduction to Computer Vision and Basic Concepts of Image Formation",
+            "branch": "AI",
+            "level": "Intermediate",
+            "description": "This intermediate-level guide bridges conceptual basics and practical application in CVIP. It expands on image types, storage calculations, sampling, and quantization with mathematical models like f(x, y) = i(x, y) × r(x, y). It introduces geometric projection models and CCD/CMOS sensor differences while emphasizing resolution, color depth, and file size. Applications include robotics, AR, and medical diagnostics. Designed for students with foundational knowledge in image processing, this version explains both the physical and computational aspects of image formation and prepares learners for hands-on coding, project implementation, or further academic study in AI and vision systems.",
+            "link": "https://drive.google.com/file/d/11fhTjt2Mn-ZKURSBTFWKM76OEFZww-qc/view?usp=sharing"
+          },
+          {
+            "course": "Introduction to Computer Vision and Basic Concepts of Image Formation",
+            "branch": "AI",
+            "level": "Beginner",
+            "description": "This beginner guide introduces Computer Vision & Image Processing in a simple, engaging way. It covers what CV is, where it's used (like face unlock, self-driving cars, and healthcare), and how images are captured, stored, and represented using pixels. Core topics like image types (binary, grayscale, RGB), resolution, sampling, and quantization are explained with real-life examples. Students learn how cameras work using light, lenses, and sensors, building a solid foundation for further learning. Ideal for students with no prior exposure to CVIP, this document makes the subject approachable and relevant using illustrations and simplified definitions.",
+            "link": "https://drive.google.com/file/d/16bqDj4RqJGnzNSyaZAkqvdu2OoT4A4Hr/view?usp=sharing"
+          },
+          {
+            "course": "Introduction to Computer Vision and Basic Concepts of Image Formation",
+            "branch": "AI",
+            "level": "Advanced",
+            "description": "The advanced guide offers an in-depth exploration of CVIP, covering mathematical models, pinhole camera projections, photometric stereo, radiometric functions, and multidimensional image representations. It emphasizes real-world engineering applications like HDR imaging, structure-from-motion, and image warping. Tools like OpenCV, MATLAB, and TensorFlow are discussed alongside research references. Designed for high-level learners or project-driven students, this version includes derivations, advanced storage calculations, and analytical comparisons (e.g., CCD vs. CMOS). It is perfect for students pursuing research, internships, or advanced CV-based projects, blending theory, math, and professional tools for a comprehensive CVIP understanding.",
+            "link": "https://docs.google.com/document/d/11yfdup3AnsetZRJ5hgwRR5Buegei6HCU/edit?usp=sharing&ouid=104608362266216366007&rtpof=true&sd=true"
+          },
+          {
+            "course": "Introduction to Database System Concepts",
+            "branch": "AI",
+            "level": "Intermediate",
+            "description": "Tailored for 2nd-year B.Tech AI students (R22 regulation), this intermediate-level guide for Unit 1 of Data Structures explores arrays, linked lists, stacks, expression conversion, and Tower of Hanoi. It emphasizes time/space complexity, with code snippets for operations like linked list insertion and infix-to-postfix conversion. Real-world examples, such as stacks for undo operations, enhance understanding. Practice questions, YouTube links (e.g., Gate Smashers), and an 8.5-hour study plan support learning. This guide bridges foundational knowledge and advanced concepts, preparing students for efficient algorithm implementation and problem-solving.",
+            "link": "https://docs.google.com/document/d/1HPWhUABOOHT_dx7gvHAJz67Il43kn4fa/edit?usp=sharing&ouid=104608362266216366007&rtpof=true&sd=true"
+          },
+          {
+            "course": "Introduction to Database System Concepts",
+            "branch": "AI",
+            "level": "Beginner",
+            "description": "This beginner-level study guide for 2nd-year B.Tech AI students (R22 regulation) introduces Unit 1 of Data Structures, covering arrays, linked lists, stacks, expression conversion, and Tower of Hanoi. It provides simple definitions, real-world examples like arrays for temperature readings, and basic code snippets. Key concepts include linear vs. non-linear structures and ADTs. Practice questions, YouTube resources (e.g., Jenny's Lectures), and time management tips (e.g., 1-hour reading) aid learning. Designed for foundational understanding, it ensures students grasp data organization and basic operations for efficient algorithm design.",
+            "link": "https://docs.google.com/document/d/14_282auyhL-z4Rqwf_bQP_w9ytDk31Kq/edit?usp=sharing&ouid=104608362266216366007&rtpof=true&sd=true"
+          },
+          {
+            "course": "Introduction to Database System Concepts",
+            "branch": "AI",
+            "level": "Advanced",
+            "description": "This advanced-level study guide for 2nd-year B.Tech AI students (R22 regulation) dives deep into Unit 1 of Data Structures, covering arrays, linked lists, stacks, expression conversion, and Tower of Hanoi. It focuses on memory models, recursion analysis (e.g., O(2ⁿ) for Hanoi), and optimization techniques like dynamic arrays. Complex operations, such as reversing linked lists and postfix evaluation, are detailed with code. Real-time applications (e.g., compilers) and practice questions are included. With YouTube resources, an 11.5-hour study plan, and textbook references (e.g., CLRS), it equips students for scalable, efficient algorithm design.",
+            "link": "https://docs.google.com/document/d/1f-iD8pwGFfCeWzz4fXt16fRXBjw5VMML/edit?usp=sharing&ouid=104608362266216366007&rtpof=true&sd=true"
+          },
+          {
+            "course": "Overview of Artificial Intelligence: Introduction.",
+            "branch": "IT",
+            "level": "Intermediate",
+            "description": "This is engages 3rd-year B.Tech IT students under R22 regula tion with a conversational AI overview. It explores the Turing Test, Weak vs. Strong AI, heuristics, and AI-suitable problems (e.g., MYCIN, barcode scanners). Practical exam ples like Netflix recommendations and the Water Jug problem make concepts accessible. Covering AI methods (search algorithms, neural networks) and history (Aristotle to Deep Blue), it balances theory and application. Suited for students with some AI exposure, it supports R22's curriculum by illustrating AI's impact in healthcare and technology, fostering understanding through a student-friendly narrative and real-world relevance",
+            "link": "https://drive.google.com/file/d/1c7u_yrOPWi4AvrxHAO-jagNW7YSvBQSM/view?usp=sharing"
+          },
+          {
+            "course": "Overview of Artificial Intelligence: Introduction.",
+            "branch": "IT",
+            "level": "Advanced",
+            "description": "This challenges 3rd-year B.Tech IT students under R22 reg ulation with a technical AI exploration. It delves into AI's interdisciplinary foundations, the Turing Test's limitations, Strong vs. Weak AI debates, and heuristic algorithms (e.g., A* search). Complex applications like AlphaFold and Google Maps showcase AI's capa bilities. It details knowledge representation, history (Aristotle to Watson), and modern advancements (Tesla's Autopilot). With theoretical insights and ethical discussions, it aligns with R22's advanced AI curriculum, equipping students to analyze AI's technical and philosophical dimensions in robotics, finance, and beyond, ideal for those with strong 1 AI foundations.",
+            "link": "https://drive.google.com/file/d/1lYVA4r-qX_jM8QE7IqQp-oofVhTOBZcB/view?usp=sharing"
+          },
+          {
+            "course": "Overview of Artificial Intelligence: Introduction.",
+            "branch": "IT",
+            "level": "Beginner",
+            "description": "This is ideal for 3rd-year B.Tech IT students starting AI under R22 regulation. It simplifies Artificial Intelligence concepts, covering definitions, the Turing Test, Strong vs. Weak AI, heuristics, and applications like Siri and chess. With clear examples (e.g., Google Translate, Missionaries and Cannibals), it explains AI's role in games and medicine. The PDF traces AI's history from Aristotle to Deep Blue and modern self-driving cars, using straightforward language. Aligned with R22's founda tional curriculum, it helps beginners grasp AI's basics, making smart systems relatable through everyday technology, preparing students for further AI studies",
+            "link": "https://drive.google.com/file/d/1Fgo0rDSHj4OOREPp5mIgSSKdPc8MqwvG/view?usp=sharing"
+          },
+          {
+            "course": "Introduction to Database System Concepts",
+            "branch": "IT",
+            "level": "Intermediate",
+            "description": "Designed for 3rd-year B.Tech IT students (R22 regulation), this intermediate-level guide for DBMS Unit 1 explores DBMS, database vs. file systems, characteristics, users, advantages, disadvantages, data models, schema, three-tier architecture, and client-server architecture. It introduces time complexity (e.g., O(log n) for indexed queries) and concepts like referential integrity. Examples include retail inventory systems. Practice questions, a structured 8-hour study plan, and resources like Neso Academy videos support learning. This guide bridges basics to advanced topics, equipping students for efficient database design and query optimization",
+            "link": "https://drive.google.com/file/d/1EniPE4BR32rDx3k68fwCUXy44VW0t6cY/view?usp=sharing"
+          },
+          {
+            "course": "Introduction to Database System Concepts",
+            "branch": "IT",
+            "level": "Advanced",
+            "description": "This advanced-level guide for 3rd-year B.Tech IT students (R22 regulation) delves into DBMS Unit 1, covering DBMS, file systems, characteristics, users, advantages, disadvantages, data models, schema, three-tier, and client-server architectures. It emphasizes distributed systems, ACID transactions, and query optimization (e.g., O(log n) with B+ trees). Real-world cases like Google Spanner and DynamoDB highlight scalability. Practice questions focus on system design (e.g., sharding), with an 11.5-hour study plan and resources like Jenny's Lectures. It prepares students for complex database challenges in distributed and high-performance environments.",
+            "link": "https://drive.google.com/file/d/1CPT0zfrOrSf4Q8wJCbgdIttKDOBrz95q/view?usp=sharing"
+          },
+          {
+            "course": "Introduction to Database System Concepts",
+            "branch": "IT",
+            "level": "Beginner",
+            "description": "This beginner-level guide for 3rd-year B.Tech IT students (R22 regulation) introduces DBMS Unit 1, covering DBMS basics, database vs. file systems, characteristics, users, advantages, disadvantages, data models, and schema concepts. It uses simple explanations, like comparing a DBMS to a digital librarian, with examples such as school record systems. Key points include organized storage, security, and relational models. Practice questions and study tips (e.g., 1-hour reading) enhance understanding. Ideal for foundational learning, it prepares students to grasp database management and its benefits over manual systems",
+            "link": "https://drive.google.com/file/d/1CPT0zfrOrSf4Q8wJCbgdIttKDOBrz95q/view?usp=sharing"
+          }
+        ]
+    QdrantRAGAgent(collection_name="tutorKB").create_collection(knowledge_base=knowledge_base)

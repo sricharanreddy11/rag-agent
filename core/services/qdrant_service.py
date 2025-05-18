@@ -1,3 +1,4 @@
+import json
 import os
 import qdrant_client
 import openai
@@ -5,6 +6,7 @@ from qdrant_client.http import models
 import uuid
 import logging
 from typing import List, Dict, Optional
+import re
 
 from core.services.llm_interface import LLMInterface
 from university_agent.utils import get_previous_context_from_session, identify_creation_intent_and_execute
@@ -165,6 +167,10 @@ class QdrantRAGAgent:
         if not vector_results:
             logger.warning("No results found in vector search")
             return ""
+
+        if len(vector_results) == 1:
+            return vector_results[0].payload.get('context', "")
+
         context_parts = []
         for r in vector_results:
             context_parts.append(f"""{r.payload.get('context', "")}
@@ -262,6 +268,41 @@ class QdrantRAGAgent:
                 config_name='university-agent'
             )
             return response
+        except Exception as e:
+            logger.error(f"Failed to get response for rag agent: {str(e)}")
+            return "I apologize, but I'm having trouble processing your request at the moment."
+
+    def get_response_for_tutor(self, user_query: str, user_details = None, user_level = "medium") -> str:
+
+        user_query = f"User Details: {user_details}\n User Level: {user_level}\n User Query: {user_query}"
+        try:
+            context_dict = self.get_context_from_vector_db(
+                user_query=user_query,
+                n_points=1
+            )
+            if not context_dict:
+                context_dict = {
+                    "description": "There is no relevant context available for this query.",
+                }
+            link = 'https://anurag.edu.in'
+            if isinstance(context_dict, dict):
+                link = context_dict.pop('link', "")
+
+            def clean_json_response(raw_content: str):
+                return re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_content.strip())
+
+            content = LLMInterface().get_custom_response(
+                config_name="tutor-agent",
+                user_prompt=user_query,
+            )
+            if not content:
+                response_dict = {}
+            else:
+                cleaned = clean_json_response(content)
+                response_dict = json.loads(cleaned)
+
+            response_dict['link'] = link
+            return response_dict
         except Exception as e:
             logger.error(f"Failed to get response for rag agent: {str(e)}")
             return "I apologize, but I'm having trouble processing your request at the moment."

@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.views import APIView
 
 from core.services.qdrant_service import QdrantRAGAgent
 from university_agent.models import ChatSession, ChatMessage, Task
@@ -120,3 +121,25 @@ class TaskAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Task.objects.all()
+
+
+class TutorAPI(APIView):
+
+    def get(self, request, *args, **kwargs):
+        user_query = request.GET.get('user_query')
+        user_details = request.GET.get('user_details')
+        user_level = request.GET.get('user_level')
+        if not user_query:
+            return Response({'detail': 'No user query provided'}, status=HTTP_400_BAD_REQUEST)
+
+        try:
+            rag_agent = QdrantRAGAgent(collection_name="tutorKB")
+            response = rag_agent.get_response_for_tutor(
+                user_query,
+                user_details=user_details,
+                user_level=user_level
+            )
+        except Exception as e:
+            return Response({'detail': str(e)}, status=HTTP_400_BAD_REQUEST)
+
+        return Response(response, status=HTTP_200_OK)
