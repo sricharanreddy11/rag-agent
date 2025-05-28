@@ -54,7 +54,8 @@ INSTALLED_APPS = [
 
     'authenticator',
     'core',
-    'university_agent'
+    'university_agent',
+    'email_agent',
 ]
 
 MIDDLEWARE = [
